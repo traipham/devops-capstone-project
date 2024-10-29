@@ -1,5 +1,5 @@
 ---
-name: Issue template 1
+name: user-story
 about: Issue template from Exercise 3
 title: ''
 labels: ''
