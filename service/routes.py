@@ -104,7 +104,36 @@ def read_account(id):
 
 # ... place you code here to UPDATE an account ...
 
+@app.route("/accounts/<id>", methods=["POST"])
+def update_account(id):
+    """
+    Update an account
+    """
+    app.logger.info("Request to update an Account")
+    body = request.get_json()
+    account = Account.find(id)
+    if not account:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Account of id: {id} can not be found!",
+        )
 
+    account_json = account.serialize()
+    # Update account
+    for k,v in body.items():
+        if not k in account_json.keys():
+            abort(
+                status.HTTP_409_CONFLICT,
+                f"Can not update account with attribute: {k}"
+            )
+        account_json[k] = v
+    
+    # Update DB
+    account.deserialize(account_json)
+    account.update()
+
+    return account.serialize(), status.HTTP_200_OK
+    
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
