@@ -142,3 +142,17 @@ class TestAccountService(TestCase):
         account_id = 101
         get_response = self.client.get(BASE_URL+f'/{account_id}')
         self.assertEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_list_accounts(self):
+        # Empty list scenario
+        get_response = self.client.get(BASE_URL)
+        get_resp_data = get_response.get_json()
+        self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(0, len(get_resp_data))
+        accounts = self._create_accounts(5)
+        # Positive scenario
+        get_response = self.client.get(BASE_URL)
+        get_resp_data = get_response.get_json()
+        self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+        for i in range(len(accounts)):
+            self.assertEqual(accounts[i].email, get_resp_data[i]['email'])
