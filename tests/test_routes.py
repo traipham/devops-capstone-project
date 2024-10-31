@@ -186,3 +186,12 @@ class TestAccountService(TestCase):
             content_type="application/json"
         )
         self.assertEqual(post_resp.status_code, status.HTTP_409_CONFLICT)
+
+    def test_delete_account(self):
+        account = self._create_accounts(1)[0]
+        # Positive scenario
+        delete_resp = self.client.delete(BASE_URL+f"/{account.id}")
+        self.assertEqual(delete_resp.status_code, status.HTTP_204_NO_CONTENT)
+        # Negative scenario: bad account id
+        delete_resp = self.client.delete(BASE_URL+f"/101")
+        self.assertEqual(delete_resp.status_code, status.HTTP_404_NOT_FOUND)
