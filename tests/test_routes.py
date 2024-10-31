@@ -156,3 +156,33 @@ class TestAccountService(TestCase):
         self.assertEqual(get_response.status_code, status.HTTP_200_OK)
         for i in range(len(accounts)):
             self.assertEqual(accounts[i].email, get_resp_data[i]['email'])
+
+    def test_update_account(self):
+        mock_account = AccountFactory()
+        mock_account_serial = mock_account.serialize()
+        mock_account_serial.pop('id')
+        account = self._create_accounts(1)[0]
+
+        # Positive scenario
+        post_resp = self.client.post(
+            BASE_URL+f"/{account.id}",
+            json=mock_account_serial,
+            content_type="application/json"
+        )
+        get_resp_data = post_resp.get_json()
+        self.assertEqual(post_resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(get_resp_data['email'], mock_account_serial['email'])
+        # Negative scenario: Bad account id
+        post_resp = self.client.post(
+            BASE_URL+f"/101",
+            json=mock_account_serial,
+            content_type="application/json"
+        )
+        self.assertEqual(post_resp.status_code, status.HTTP_404_NOT_FOUND)
+        # Negative scenario: Bad request body
+        post_resp = self.client.post(
+            BASE_URL+f"/{account.id}",
+            json={"random": "value"},
+            content_type="application/json"
+        )
+        self.assertEqual(post_resp.status_code, status.HTTP_409_CONFLICT)
