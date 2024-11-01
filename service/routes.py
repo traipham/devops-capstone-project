@@ -61,7 +61,9 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
+
 # ... place you code here to LIST accounts ...
+
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
     """
@@ -102,6 +104,7 @@ def read_account(id):
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
+
 # ... place you code here to UPDATE an account ...
 
 @app.route("/accounts/<id>", methods=["POST"])
@@ -120,25 +123,27 @@ def update_account(id):
 
     account_json = account.serialize()
     # Update account
-    for k,v in body.items():
-        if not k in account_json.keys():
+    for k, v in body.items():
+        if k not in account_json.keys():
             abort(
                 status.HTTP_409_CONFLICT,
                 f"Can not update account with attribute: {k}"
             )
         account_json[k] = v
-    
+
     # Update DB
     account.deserialize(account_json)
     account.update()
 
     return account.serialize(), status.HTTP_200_OK
-    
+
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
 
+
 # ... place you code here to DELETE an account ...
+
 @app.route("/accounts/<id>", methods=["DELETE"])
 def delete_account(id):
     """
