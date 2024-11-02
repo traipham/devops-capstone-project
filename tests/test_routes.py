@@ -12,6 +12,7 @@ from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
 from service.models import db, Account, init_db
 from service.routes import app
+from service import talisman
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -19,6 +20,7 @@ DATABASE_URI = os.getenv(
 
 BASE_URL = "/accounts"
 
+HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 
 ######################################################################
 #  T E S T   C A S E S
@@ -29,6 +31,7 @@ class TestAccountService(TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests"""
+        talisman.force_https = False
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
@@ -195,3 +198,19 @@ class TestAccountService(TestCase):
         # Negative scenario: bad account id
         delete_resp = self.client.delete(BASE_URL+f"/101")
         self.assertEqual(delete_resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_security_01(self):
+        response = self.client.get(
+            "/",
+            environ_overrides=HTTPS_ENVIRON
+        )
+        headers = {
+            'X-Frame-Options': 'SAMEORIGIN',
+            'X-Content-Type-Options': 'nosniff',
+            'Content-Security-Policy': 'default-src \'self\'; object-src \'none\'',
+            'Referrer-Policy': 'strict-origin-when-cross-origin'
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for k, v in headers.items():
+            self.assertEqual(response.headers.get(k), v)
