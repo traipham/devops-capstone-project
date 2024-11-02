@@ -214,3 +214,11 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for k, v in headers.items():
             self.assertEqual(response.headers.get(k), v)
+
+    def test_security_02(self):
+        response = self.client.get(
+            "/",
+            environ_overrides=HTTPS_ENVIRON
+        )
+        self.assertIsNotNone(response.headers.get("Access-Control-Allow-Origin"))
+        self.assertEqual(response.headers.get("Access-Control-Allow-Origin"), "*")
