@@ -25,6 +25,7 @@ HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -145,7 +146,7 @@ class TestAccountService(TestCase):
         account_id = 101
         get_response = self.client.get(BASE_URL+f'/{account_id}')
         self.assertEqual(get_response.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_list_accounts(self):
         # Empty list scenario
         get_response = self.client.get(BASE_URL)
@@ -177,7 +178,7 @@ class TestAccountService(TestCase):
         self.assertEqual(get_resp_data['email'], mock_account_serial['email'])
         # Negative scenario: Bad account id
         post_resp = self.client.post(
-            BASE_URL+f"/101",
+            BASE_URL+"/101",
             json=mock_account_serial,
             content_type="application/json"
         )
@@ -196,7 +197,7 @@ class TestAccountService(TestCase):
         delete_resp = self.client.delete(BASE_URL+f"/{account.id}")
         self.assertEqual(delete_resp.status_code, status.HTTP_204_NO_CONTENT)
         # Negative scenario: bad account id
-        delete_resp = self.client.delete(BASE_URL+f"/101")
+        delete_resp = self.client.delete(BASE_URL+"/101")
         self.assertEqual(delete_resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_security_01(self):
